@@ -14,6 +14,8 @@
         justify-content: center;
         align-items: center;
         font-family: Arial, sans-serif;
+        overflow: hidden;
+        position: relative;
     }
 
     .card {
@@ -25,6 +27,7 @@
         width: 90%;
         max-width: 350px;
         position: relative;
+        z-index: 1000;
     }
 
     h1 {
@@ -45,7 +48,7 @@
         border-radius: 12px;
         cursor: pointer;
         transition: all 0.1s ease-in-out;
-        touch-action: manipulation; /* ważne na telefonach */
+        touch-action: manipulation;
     }
 
     #yes {
@@ -61,11 +64,24 @@
         top: 60px;
         transform: translateX(-50%);
     }
+
+    .heart {
+        position: absolute;
+        font-size: 24px;
+        color: #ff4da6;
+        pointer-events: none;
+        animation: fall linear;
+    }
+
+    @keyframes fall {
+        0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+    }
 </style>
 </head>
 <body>
 
-<div class="card">
+<div class="card" id="card">
     <h1>Czy zostaniesz moją Walentynką? 💘</h1>
 
     <div class="buttons">
@@ -77,7 +93,7 @@
 <script>
 const noBtn = document.getElementById("no");
 
-// Funkcja, żeby przycisk NIE uciekał po całym ekranie
+// Funkcja do uciekającego przycisku NIE
 function moveNo() {
     const screenWidth = window.innerWidth - noBtn.offsetWidth;
     const screenHeight = window.innerHeight - noBtn.offsetHeight;
@@ -90,26 +106,49 @@ function moveNo() {
     noBtn.style.transform = "none";
 }
 
-// Obsługa zarówno dotyku jak i myszy
-noBtn.addEventListener("pointerover", moveNo); // mysz / stylus
-noBtn.addEventListener("touchstart", moveNo, { passive: true }); // dotyk
+// Obsługa dotyku i myszy
+noBtn.addEventListener("pointerover", moveNo);
+noBtn.addEventListener("touchstart", moveNo, { passive: true });
 
+// Funkcja spadających serduszek
+function createHeart() {
+    const heart = document.createElement('div');
+    heart.className = 'heart';
+    heart.style.left = Math.random() * window.innerWidth + 'px';
+    heart.style.fontSize = 14 + Math.random() * 24 + 'px';
+    heart.style.animationDuration = 3 + Math.random() * 3 + 's';
+    heart.innerText = '💖';
+    document.body.appendChild(heart);
+    setTimeout(() => {
+        heart.remove();
+    }, parseFloat(heart.style.animationDuration) * 1000);
+}
+
+// Generuj serduszka co 150ms
+setInterval(createHeart, 150);
+
+// Funkcja po kliknięciu TAK
 function yesClick() {
     document.body.innerHTML = `
         <div style="
             height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             background: linear-gradient(135deg, #ff9a9e, #fad0c4);
             font-family: Arial;
             text-align: center;
+            overflow: hidden;
         ">
             <h1 style="color:#e60073;">
                 💖 JUPI! 💖<br>
                 Wiedziałem, że się zgodzisz!<br><br>
                 Kocham Cię 🥰
             </h1>
+            <a href="https://picsum.photos/400" target="_blank">
+                <img src="https://picsum.photos/400" style="margin-top:20px; border-radius:15px; max-width:90%;"/>
+            </a>
         </div>
     `;
 }
